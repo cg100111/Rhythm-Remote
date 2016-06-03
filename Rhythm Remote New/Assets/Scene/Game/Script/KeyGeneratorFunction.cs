@@ -4,16 +4,22 @@ using UnityEngine.UI;
 
 public class KeyGeneratorFunction : MonoBehaviour {
 
-    public GameObject _hitEffect;
-    public keyBarFunction _keyBar;
-
     private List<Key> _keys = new List<Key>();
     private ShowScore _scoreText;
     private ShowCombo _comboText;
     private AudioFunction _audio;
     private ShowAccEffect _accEffect;
+    public GameObject _hitEffect;
+    private ObjectPool _effectPool;
+    public keyBarFunction _keyBar;
+
     private int _RhythmOffset = 0;
     private bool _auto = false;
+
+    void Awake()
+    {
+        _effectPool = new ObjectPool(_hitEffect, 20);
+    }
 
     void Start()
     {
@@ -29,13 +35,14 @@ public class KeyGeneratorFunction : MonoBehaviour {
 
     void FixedUpdate()
     {
+        
         if (_keys.Count > 0)
         {
             if (!_keys[0].GetKeyStatus())
                 KeyFail();
             else if (_auto)
             {
-                if (_keys[0].transform.localPosition.y <= 2.9f)
+                if (_keys[0].transform.localPosition.y <= -100.2f)
                 {
                     if (_keys.Count == 1)
                     {
@@ -57,10 +64,9 @@ public class KeyGeneratorFunction : MonoBehaviour {
         _keys.Add(key);
     }
 
-    //點擊判定
     public void TouchKeys()
     {
-        if (_keys.Count > 0 && _keys[0].transform.position.y < 110.0f)
+        if (_keys.Count > 0 && _keys[0].transform.localPosition.y <= -10.0f)
         {
             int offset = Mathf.Abs(_keys[0].GetTargetTime() - _audio.GetAudioCurrentPlayTime() - _RhythmOffset);
             if (offset <= 60 || _auto)
@@ -89,16 +95,15 @@ public class KeyGeneratorFunction : MonoBehaviour {
             }
 
             this.SetEffect();
-            Destroy(_keys[0].gameObject);
+            _keys[0].Collection();
             _keys.RemoveAt(0);
             _comboText.AddCombo();
         }
     }
 
-    //點擊失敗
     private void KeyFail()
     {
-        Destroy(_keys[0].gameObject);
+        _keys[0].Collection();
         _keys.RemoveAt(0);
         _comboText.FailCombo();
         _accEffect.ShowMiss();
@@ -106,8 +111,10 @@ public class KeyGeneratorFunction : MonoBehaviour {
 
     private void SetEffect()
     {
-        GameObject effect = Instantiate(_hitEffect, _keys[0].transform.position, _keys[0].transform.rotation) as GameObject;
+        HitEffect effect = _effectPool.AccessObject(_keys[0].transform.position, _keys[0].transform.rotation).GetComponent<HitEffect>();
+        effect.SetPoolTarget(_effectPool);
         effect.transform.SetParent(this.transform.parent.transform);
+        effect.Play();
     }
 
     //Auto

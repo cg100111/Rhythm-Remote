@@ -13,7 +13,17 @@ public class Index : MonoBehaviour {
     {
         _setupMenu._sliderSong.value = PlayerPrefs.GetFloat("SongVolume");
         _setupMenu._sliderSound.value = PlayerPrefs.GetFloat("SoundVolume");
+        this.PCLoadHitSound();
     }
+
+    private void PCLoadHitSound()
+    {
+        #if !UNITY_ANDROID || UNITY_EDITOR
+            HitSound hit = GameObject.Find("AudioCenter").GetComponent<HitSound>();
+            hit.SetSound();
+        #else
+        #endif
+    } 
 
     void Start()
     {
@@ -47,6 +57,7 @@ public class Index : MonoBehaviour {
 
     private void LoadScene()
     {
+        AudioCenter.unloadSound(0);
         SceneManager.LoadSceneAsync(_sceneName, LoadSceneMode.Single);
     }
 

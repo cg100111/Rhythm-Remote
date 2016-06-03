@@ -21,9 +21,19 @@ public class SelectImageManager : MonoBehaviour {
 
     void Awake()
     {
+        this.PCLoadHitSound();
         this.LoadSprites();
         this.LoadData();
     }
+
+    private void PCLoadHitSound()
+    {
+        #if !UNITY_ANDROID || UNITY_EDITOR
+            HitSound hit = GameObject.Find("AudioCenter").GetComponent<HitSound>();
+            hit.SetSound();
+        #else
+        #endif
+    } 
 
 	// Use this for initialization
 	void Start () {

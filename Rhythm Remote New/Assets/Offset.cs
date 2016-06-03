@@ -10,6 +10,7 @@ public class Offset : MonoBehaviour {
 
     public float _reapeatTime = 1.0f;
     private bool _start = false;
+    private Vector3 _startPosition = new Vector3(80.0f, 0f, 0f);
 
 	// Use this for initialization
 	void Start () {
@@ -20,7 +21,7 @@ public class Offset : MonoBehaviour {
 	void FixedUpdate () {
 	    if(_start)
         {
-            _key.transform.Translate(0f, -76.4f * Time.fixedDeltaTime * (1.0f / _reapeatTime - (float.Parse(_textOffset.text) / 1000.0f)), 0f);
+            _key.transform.Translate(0f, -76.4f * 0.008f * (1.0f / _reapeatTime + (float.Parse(_textOffset.text) / 1000.0f)), 0f);
         }
 	}
 
@@ -51,7 +52,7 @@ public class Offset : MonoBehaviour {
 
     private void Redo()
     {
-        _key.transform.localPosition = new Vector3(80.0f, 0f, 0f);
+        _key.transform.localPosition = _startPosition;
         Invoke("PlaySound", _reapeatTime);
     }
 

@@ -4,29 +4,47 @@ using System.IO;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
 public class GameManager : MonoBehaviour {
 
     public KeyGeneratorFunction[] _keyGenerators;
     public Key[] _keyType;
+    private ObjectPool[] _objectPool;
+    private AudioFunction _audio;
+    public float _startDelayTime = 1.5f;
+    public float _endDelayTime = 1.5f;
+    public float _approchRateTime = 1000.0f;
+    private GameObject _keys;
+    private List<KeyTime> _keyQueue = new List<KeyTime>();
+    private int _RhythmOffset = 0;
+
     public GameObject _blackMask;
     public ShowCombo _combo;
     public ShowScore _score;
     public ShowAccEffect _effect;
-    public float _startDelayTime = 1.5f;
-    public float _endDelayTime = 1.5f;
-    public float _approchRateTime = 1000.0f;
-
-    private GameObject _keys;
-    private List<List<int>> _keyQueue = new List<List<int>>();
-    private AudioFunction _audio;
-    private int _RhythmOffset = 0;
 
     void Awake()
     {
-        Application.targetFrameRate = 60;
+        #if UNITY_ANDROID && !UNITY_EDITOR
+            Application.targetFrameRate = 60;  //電腦用 Unity Editer 垂直同步 手機用 targetFrameRate
+        #else
+        #endif
+
         _audio = GameObject.Find("AudioSource").GetComponent<AudioFunction>();
         _keys = GameObject.Find("Keys");
         _RhythmOffset = PlayerPrefs.GetInt("Offset");
+
+        _objectPool = new ObjectPool[7]
+        {
+           new ObjectPool(_keyType[0].gameObject, 10),
+           new ObjectPool(_keyType[1].gameObject, 10),
+           new ObjectPool(_keyType[2].gameObject, 10),
+           new ObjectPool(_keyType[3].gameObject, 10),
+           new ObjectPool(_keyType[4].gameObject, 10),
+           new ObjectPool(_keyType[5].gameObject, 10),
+           new ObjectPool(_keyType[6].gameObject, 10),
+        };
+
         this.Load();
     }
 
@@ -34,38 +52,33 @@ public class GameManager : MonoBehaviour {
 	void Start () {
         _audio.Volume = PlayerPrefs.GetFloat("SongVolume");
         Invoke("Play", _startDelayTime);
-    }
+	}
 
     void FixedUpdate()
     {
         if (_keyQueue.Count != 0)
         {
-            int time = _keyQueue[0][1];
-            if (time <= _audio.GetAudioCurrentPlayTime() + _RhythmOffset)
+            while (true)
             {
-                AddKey(time);
+                int pos = _keyQueue[0].GetPos();
+                int time = _keyQueue[0].GetTime();
+                if (time <= _audio.GetAudioCurrentPlayTime() + _RhythmOffset)
+                {
+                    Key key = _objectPool[pos].AccessObject(_keyGenerators[pos].transform.position, _keyGenerators[pos].transform.rotation).GetComponent<Key>();
+                    key.transform.SetParent(_keys.transform);
+                    key.SetKeyInformation(_approchRateTime, time + (int)_approchRateTime, _objectPool[pos]);
+                    _keyGenerators[pos].AddKeys(key);
+                    _keyQueue.RemoveAt(0);
+                    if (_keyQueue.Count != 0 && time == _keyQueue[0].GetTime())
+                        continue;
+                }
+                break;
             }
             if(_keyQueue.Count == 0)
                 Invoke("EndGame", _endDelayTime);
         }
     }
 
-    //產生跟time相同時間的所有節奏
-    private void AddKey(int time)
-    {
-        int pos = 0;
-        while (_keyQueue.Count != 0 && time == _keyQueue[0][1])
-        {
-            pos = _keyQueue[0][0];
-            Key key = Instantiate(_keyType[pos], _keyGenerators[pos].transform.position, _keyGenerators[pos].transform.rotation) as Key;
-            key.transform.SetParent(_keys.transform);
-            key.SetKeyInformation(_approchRateTime, time + (int)_approchRateTime);
-            _keyGenerators[pos].AddKeys(key);
-            _keyQueue.RemoveAt(0);
-        }
-    }
-
-    //載入譜面
     private void Load()
     {
         string songsText = PlayerPrefs.GetString("SongsTextData");
@@ -76,7 +89,6 @@ public class GameManager : MonoBehaviour {
         {
             int time = int.Parse(text[i]);
             time -= (int)_approchRateTime;
-            List<int> item = new List<int>();
             int rand = -1;
             while (true)
             {
@@ -86,9 +98,8 @@ public class GameManager : MonoBehaviour {
                 else
                     break;
             }
-            item.Add(rand);
-            item.Add(time);
-            _keyQueue.Add(item);
+            KeyTime key = new KeyTime(rand, time);
+            _keyQueue.Add(key);
             offset = rand;
         }
     }
@@ -118,6 +129,7 @@ public class GameManager : MonoBehaviour {
 
     private void LoadResult()
     {
+        AudioCenter.unloadSound(0);
         SceneManager.LoadSceneAsync("Result", LoadSceneMode.Single);
     }
 }

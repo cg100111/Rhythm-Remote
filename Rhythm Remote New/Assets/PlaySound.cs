@@ -13,6 +13,6 @@ public class PlaySound : MonoBehaviour,IPointerClickHandler {
 
     public void OnPointerClick(PointerEventData data)
     {
-        AudioCenter.playSound(_soundId);
+        //AudioCenter.playSound(_soundId);
     }
 }

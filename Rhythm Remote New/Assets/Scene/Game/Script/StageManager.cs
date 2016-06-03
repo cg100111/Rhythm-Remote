@@ -9,6 +9,20 @@ public class StageManager : MonoBehaviour {
     private AudioFunction _audio;
     private string _sceneName;
 
+    void Awake()
+    {
+        this.PCLoadHitSound();
+    }
+
+    private void PCLoadHitSound()
+    {
+        #if !UNITY_ANDROID || UNITY_EDITOR
+            HitSound hit = GameObject.Find("AudioCenter").GetComponent<HitSound>();
+            hit.SetSound();
+        #else
+        #endif
+    } 
+
     void Start()
     {
         _blackMask.GetComponent<Image>().raycastTarget = false;
@@ -37,6 +51,7 @@ public class StageManager : MonoBehaviour {
 
     private void LoadScene()
     {
+        AudioCenter.unloadSound(0);
         SceneManager.LoadSceneAsync(_sceneName, LoadSceneMode.Single);
     }
 }
