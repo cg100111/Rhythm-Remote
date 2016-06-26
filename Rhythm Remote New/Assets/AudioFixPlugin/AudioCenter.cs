@@ -55,6 +55,7 @@ public class AudioCenter : MonoBehaviour {
 		public static int loadSound( string soundName ) {
             var soundID = 0;
 			var audioClip = Resources.Load<AudioClip>("Sounds/" + soundName);
+        Debug.Log(AudioCenter.instance.audioDic.Count);
 			AudioCenter.instance.audioDic[soundID] = audioClip;
 			return soundID;
 		}
