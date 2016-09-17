@@ -4,15 +4,14 @@ using UnityEngine.UI;
 
 public class KeyGeneratorFunction : MonoBehaviour {
 
+    public GameObject _hitEffect;
+    public keyBarFunction _keyBar;
     private List<Key> _keys = new List<Key>();
     private ShowScore _scoreText;
     private ShowCombo _comboText;
     private AudioFunction _audio;
     private ShowAccEffect _accEffect;
-    public GameObject _hitEffect;
     private ObjectPool _effectPool;
-    public keyBarFunction _keyBar;
-
     private int _RhythmOffset = 0;
     private bool _auto = false;
 

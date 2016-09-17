@@ -5,9 +5,8 @@ public class ObjectPool{
 
     private List<GameObject> _objects;
     private GameObject _parent;
-    private List<int> _emptyRecord = new List<int>();
-    private List<bool> _notUsedRecord;
-
+    private List<int> _emptyRecord = new List<int>();           
+    private List<bool> _notUsedRecord;                                //記錄沒使用的Object
 
     //---------------------------------
     private Vector3 _poolPosition = new Vector3(-999.0f, -999.0f, -999.0f);
@@ -23,6 +22,7 @@ public class ObjectPool{
         this.Create(count);
     }
 
+    //建立GameObject pool
     private void Create(int count)
     {
         for (int i = 0; i < count; i++)
@@ -33,6 +33,7 @@ public class ObjectPool{
         }
     }
 
+    //回收GameObject
     public void CollectionObject(GameObject obj)
     {
         obj.SetActive(false);
@@ -41,6 +42,7 @@ public class ObjectPool{
         _emptyRecord.RemoveAt(0);
     }
 
+    //使用GameObject 傳入開始座標,旋轉角度
     public GameObject AccessObject(Vector3 position, Quaternion rotation)
     {
         for (int i = 0; i < _notUsedRecord.Count; i++)

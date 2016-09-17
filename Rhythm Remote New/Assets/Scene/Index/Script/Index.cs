@@ -34,7 +34,7 @@ public class Index : MonoBehaviour {
     {
         _blackMask.GetComponent<Animator>().SetBool("_switch", true);
         _blackMask.GetComponent<Image>().raycastTarget = true;
-        _sceneName = "Select";
+        _sceneName = "Mode";
         PlayerPrefs.SetFloat("SongVolume", _setupMenu._sliderSong.value);
         PlayerPrefs.SetFloat("SoundVolume", _setupMenu._sliderSound.value);
         PlayerPrefs.SetInt("Offset", _setupMenu._offsetMenu.GetOffset());

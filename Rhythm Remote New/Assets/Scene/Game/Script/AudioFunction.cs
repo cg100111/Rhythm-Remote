@@ -4,11 +4,17 @@ using System.Collections;
 public class AudioFunction : MonoBehaviour {
 
     private AudioSource _audio;
-    private float _musicTime = 3;
+    private float _musicTime = 3.0f;
+    private bool _start;
+
+    void Awake()
+    {
+        _audio = this.GetComponent<AudioSource>();
+        _start = false;
+    }
 
     // Use this for initialization
     void Start () {
-        _audio = this.GetComponent<AudioSource>();
         AudioClip clip = Resources.Load<AudioClip>("Songs/" + PlayerPrefs.GetString("SongsTextData"));
         _audio.clip = clip;
 	}
@@ -37,7 +43,20 @@ public class AudioFunction : MonoBehaviour {
             return -(int)(_musicTime * 1000.0f);
         else
             return (int)(_audio.time * 1000.0f);
-        //return ((int)(_audio.time * 1000.0f));
+    }
+
+    //音樂是否播放結束
+    public bool IsFinish()
+    {
+        if (_start && !_audio.isPlaying)
+            return true;
+        return false;
+    }
+
+    //設定幾秒後開始撥放音樂
+    public void SetPlayMusicAfterSeconds(float musicTime)
+    {
+        _musicTime = musicTime;
     }
 
     public float GetClipTime()
@@ -47,6 +66,7 @@ public class AudioFunction : MonoBehaviour {
 
     public void Play()
     {
+        _start = true;
         _audio.Play();
     }
 
@@ -61,9 +81,9 @@ public class AudioFunction : MonoBehaviour {
         {
             return _audio.volume;
         }
-
         set
         {
+            Debug.Log("set audio volume");
             _audio.volume = value;
         }
     }

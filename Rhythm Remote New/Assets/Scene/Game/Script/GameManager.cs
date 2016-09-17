@@ -79,6 +79,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //載入
     private void Load()
     {
         string songsText = PlayerPrefs.GetString("SongsTextData");

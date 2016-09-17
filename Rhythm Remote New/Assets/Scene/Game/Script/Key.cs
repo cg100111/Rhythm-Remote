@@ -8,9 +8,10 @@ public class Key : MonoBehaviour {
     private bool _status = true;
     private ObjectPool _poolTarget;
     
+
     void FixedUpdate()
     {
-        this.transform.Translate(0f, -250.4f * 0.008f * (1000.0f / _approchRateTime), 0f);
+        move();
         if (this.transform.localPosition.y <= -138.5f)
             _status = false;
     }
@@ -20,6 +21,12 @@ public class Key : MonoBehaviour {
         _approchRateTime = approchRateTime;
         _targetTime = targetTime;
         _poolTarget = poolObject;
+    }
+
+    //移動
+    private void move()
+    {
+        this.transform.Translate(0f, -250.4f * 0.008f * (1000.0f / _approchRateTime), 0f);
     }
 
     public bool GetKeyStatus()
